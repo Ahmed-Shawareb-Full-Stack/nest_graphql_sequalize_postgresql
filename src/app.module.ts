@@ -1,6 +1,7 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { join } from 'path';
@@ -16,6 +17,8 @@ import { join } from 'path';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE'),
+        synchronize: true,
+        autoLoadModels: true,
         models: [],
       }),
       inject: [ConfigService],
@@ -27,6 +30,11 @@ import { join } from 'path';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}
