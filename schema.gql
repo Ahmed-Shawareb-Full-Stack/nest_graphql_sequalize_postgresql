@@ -1,0 +1,45 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateUserInput {
+  createdAt: Timestamp!
+  email: String!
+  firstName: String!
+  lastName: String!
+  updatedAt: Timestamp!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  removeUser(id: Int!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  user(id: Int!): User!
+  users: [User!]!
+}
+
+"""
+`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+input UpdateUserInput {
+  createdAt: Timestamp
+  email: String
+  firstName: String
+  id: Int!
+  lastName: String
+  updatedAt: Timestamp
+}
+
+type User {
+  createdAt: Timestamp!
+  email: String!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  updatedAt: Timestamp!
+}
