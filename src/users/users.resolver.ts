@@ -1,3 +1,5 @@
+import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import * as Upload from 'graphql-upload/Upload.js';
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
@@ -13,23 +15,15 @@ export class UsersResolver {
     return this.usersService.create(createUserInput);
   }
 
-  @Query(() => [User], { name: 'users' })
-  findAll() {
-    return this.usersService.findAll();
+  @Query(() => String, { name: 'hello' })
+  hello() {
+    return 'Hello';
   }
 
-  @Query(() => User, { name: 'user' })
-  findOne(@Args('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Mutation(() => User)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.usersService.update(updateUserInput.id, updateUserInput);
-  }
-
-  @Mutation(() => User)
-  removeUser(@Args('id') id: string) {
-    return this.usersService.remove(id);
+  @Mutation(() => String, { name: 'uploadFile' })
+  async uploadFile(
+    @Args({name : "file" ,  type: () => GraphQLUpload }) file: Upload,
+  ) {
+    return await this.usersService.uploadUserImage(file);
   }
 }

@@ -1,16 +1,23 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, Int, ID, DateScalarMode } from '@nestjs/graphql';
+import { DataType } from 'sequelize-typescript';
 
 @ObjectType()
 export class User {
-  @Field(() => String)
-  id!: string;
+  @Field(() => ID)
+  ID: string;
 
   @Field(() => String)
-  firstName!: string;
+  FirstName: string;
 
   @Field(() => String)
-  lastName?: string;
+  LastName: string;
 
   @Field(() => String)
-  email?: string;
+  Email: string;
+
+  @Field(() => Date)
+  CreatedAt: Date;
+
+  @Field(() => Date)
+  UpdatedAt: Date;
 }
