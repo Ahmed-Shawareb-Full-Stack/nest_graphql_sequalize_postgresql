@@ -1,20 +1,20 @@
 import { InputType, Int, Field, ID } from '@nestjs/graphql';
+import { IsEmail, MinLength } from 'class-validator';
 
 @InputType()
 export class CreateUserInput {
+  @Field(() => String)
+  @MinLength(3, { message: 'Please enter a valid name' })
+  FirstName: string;
 
   @Field(() => String)
-  firstName: string;
+  @MinLength(3, { message: 'Please enter a valid name' })
+  LastName: string;
 
   @Field(() => String)
-  lastName: string;
+  @IsEmail({}, { message: 'Please enter a valid email' })
+  Email: string;
 
   @Field(() => String)
-  email: string;
-
-  @Field(() => Date)
-  createdAt: Date;
-
-  @Field(() => Date)
-  updatedAt: Date;
+  Password: string;
 }

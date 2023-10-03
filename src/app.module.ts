@@ -6,6 +6,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -29,12 +31,25 @@ import { UsersModule } from './users/users.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), '../schema.gql'),
-      sortSchema: true,
       buildSchemaOptions: {
-        dateScalarMode: 'timestamp',
+        dateScalarMode: 'isoDate',
       },
     }),
     UsersModule,
+    AuthModule,
+    JwtModule.registerAsync({
+      global: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          signOptions: {
+            expiresIn: configService.get('JWT_EXPIRES'),
+          },
+          secret: configService.get('JWT_SECRET'),
+        };
+      },
+    }),
   ],
   controllers: [],
   providers: [

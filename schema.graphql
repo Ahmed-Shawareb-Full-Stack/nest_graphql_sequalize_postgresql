@@ -1,0 +1,42 @@
+type User {
+  ID: ID!
+  FirstName: String!
+  LastName: String!
+  Email: String!
+  CreatedAt: DateTime!
+  UpdatedAt: DateTime!
+}
+
+# A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+scalar DateTime
+
+type LoginUser {
+  accessToken: String!
+}
+
+type Query {
+  hello: String!
+  me: User!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  uploadFile(file: Upload!): String!
+  register(createUserInput: CreateUserInput!): User!
+  login(loginUserInput: LoginUserInput!): LoginUser!
+}
+
+input CreateUserInput {
+  FirstName: String!
+  LastName: String!
+  Email: String!
+  Password: String!
+}
+
+# The `Upload` scalar type represents a file upload.
+scalar Upload
+
+input LoginUserInput {
+  Email: String!
+  Password: String!
+}

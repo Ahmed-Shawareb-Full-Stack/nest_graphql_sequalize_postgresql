@@ -4,20 +4,20 @@ import { DataType } from 'sequelize-typescript';
 @ObjectType()
 export class User {
   @Field(() => ID)
-  id: string;
+  ID: string;
 
   @Field(() => String)
-  firstName: string;
+  FirstName: string;
 
   @Field(() => String)
-  lastName: string;
+  LastName: string;
 
   @Field(() => String)
-  email: string;
+  Email: string;
 
   @Field(() => Date)
-  createdAt: Date;
+  CreatedAt: Date;
 
   @Field(() => Date)
-  updatedAt: Date;
+  UpdatedAt: Date;
 }
