@@ -8,6 +8,12 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  AcceptLanguageResolver,
+  GraphQLWebsocketResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -35,8 +41,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         dateScalarMode: 'isoDate',
       },
     }),
-    UsersModule,
-    AuthModule,
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
@@ -50,6 +54,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         };
       },
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        GraphQLWebsocketResolver,
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+      ],
+    }),
+    AuthModule,
     UsersModule,
   ],
   controllers: [],
