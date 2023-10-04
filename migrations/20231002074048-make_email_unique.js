@@ -15,6 +15,7 @@ module.exports = {
         'Users',
         'Email',
         {
+          type: Sequelize.DataTypes.STRING,
           allowNull: false,
         },
         { transaction },
@@ -23,6 +24,7 @@ module.exports = {
         'Users',
         'FirstName',
         {
+          type: Sequelize.DataTypes.STRING(25),
           allowNull: false,
         },
         { transaction },
@@ -31,6 +33,7 @@ module.exports = {
         'Users',
         'LastName',
         {
+          type: Sequelize.DataTypes.STRING(25),
           allowNull: false,
         },
         { transaction },
@@ -39,6 +42,7 @@ module.exports = {
         'Users',
         'Password',
         {
+          type: Sequelize.DataTypes.TEXT,
           allowNull: false,
         },
         { transaction },

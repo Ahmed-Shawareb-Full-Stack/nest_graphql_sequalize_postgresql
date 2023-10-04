@@ -36,7 +36,7 @@ module.exports = {
               tableName: 'Users',
               schema: 'public',
             },
-            key: 'ID',
+            key: 'id',
           },
           allowNull: true,
         },

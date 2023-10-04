@@ -13,6 +13,8 @@ import * as sharp from 'sharp';
 import { ImageProcessing } from '../Libs/ImageProcessing';
 import { UserImages } from './model/user-image.model';
 import * as crypto from 'crypto';
+import { I18nService } from 'nestjs-i18n';
+import { TranslateService } from 'src/i18n/Translate.service';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +22,8 @@ export class UsersService {
     @InjectModel(User) private userModel: typeof User,
     @InjectModel(UserImages) private userImagesModel: typeof UserImages,
     private readonly imageProcess: ImageProcessing,
+    private i18nService: I18nService,
+    private translationService: TranslateService,
   ) {}
   async create(createUserInput: CreateUserInput) {
     try {
@@ -93,5 +97,10 @@ export class UsersService {
     //     });
     // });
     return true;
+  }
+
+  async local(lang, data) {
+    console.log(lang);
+    return this.translationService.translate('HELLO', lang);
   }
 }

@@ -22,6 +22,12 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
+  @Query(() => String)
+  localize(@Context() context) {
+    const requestLanguageFromHeader = context.req.headers['accept-language'];
+    return this.usersService.local(requestLanguageFromHeader, '');
+  }
+
   @Mutation(() => User)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
     return this.usersService.create(createUserInput);
@@ -44,7 +50,7 @@ export class UsersResolver {
     files: Promise<Upload>[],
     @Context() context,
   ) {
-    const user =context.req.user;
-    return await this.usersService.uploadUserImage(user.ID , files);
+    const user = context.req.user;
+    return await this.usersService.uploadUserImage(user.ID, files);
   }
 }

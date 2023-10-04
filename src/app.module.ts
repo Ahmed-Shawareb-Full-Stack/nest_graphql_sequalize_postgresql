@@ -56,18 +56,19 @@ import {
         };
       },
     }),
-    // I18nModule.forRoot({
-    //   fallbackLanguage: 'en',
-    //   loaderOptions: {
-    //     path: join(__dirname, '/i18n/'),
-    //     watch: true,
-    //   },
-    //   resolvers: [
-    //     GraphQLWebsocketResolver,
-    //     { use: QueryResolver, options: ['lang'] },
-    //     AcceptLanguageResolver,
-    //   ],
-    // }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: 'src/i18n/langs',
+        watch: true,
+        includeSubfolders: true,
+      },
+      resolvers: [
+        GraphQLWebsocketResolver,
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+      ],
+    }),
     AuthModule,
     UsersModule,
   ],
