@@ -10,7 +10,10 @@ export class ImageProcessing {
   ) {
     const operation = await new Promise((resolve, reject) => {
       fileStream
-        .pipe(sharp().resize(sharpOptions))
+        .pipe(sharp().toFormat('webp'))
+        .resize(sharpOptions)
+        .flatten(false)
+        .webp({ quality: 5, force: true })
         .toFile(fileDestination, (error, info) => {
           if (error) reject('error');
           resolve('done');

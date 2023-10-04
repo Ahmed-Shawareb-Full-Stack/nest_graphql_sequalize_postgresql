@@ -48,6 +48,6 @@ export class User extends Model {
   @Column
   UpdatedAt: Date;
 
-  @HasMany(() => UserImages, 'UserId')
+  @HasMany(() => UserImages, 'UserID')
   Images: UserImages[];
 }

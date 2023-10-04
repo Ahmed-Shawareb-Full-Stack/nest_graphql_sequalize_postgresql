@@ -26,7 +26,7 @@ export class UserImages extends Model {
   @Column({ type: DataType.TEXT })
   URL: string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column({ type: DataType.STRING })
   Type: string;
 
@@ -43,6 +43,6 @@ export class UserImages extends Model {
   @Column
   UserID: string;
 
-  @BelongsTo(() => User, 'UserId')
+  @BelongsTo(() => User, 'UserID')
   User: User;
 }

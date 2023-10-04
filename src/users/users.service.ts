@@ -5,17 +5,20 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from './model/user.model';
 import SerializeGQLInput from '../Libs/serializeGQL';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { join } from 'path';
+import * as path from 'path';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import * as Upload from 'graphql-upload/Upload.js';
 import * as concat from 'concat-stream';
 import * as sharp from 'sharp';
 import { ImageProcessing } from '../Libs/ImageProcessing';
+import { UserImages } from './model/user-image.model';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User) private userModel: typeof User,
+    @InjectModel(UserImages) private userImagesModel: typeof UserImages,
     private readonly imageProcess: ImageProcessing,
   ) {}
   async create(createUserInput: CreateUserInput) {
@@ -28,6 +31,7 @@ export class UsersService {
   async findByEmail(email: string) {
     const user = await this.userModel.findOne({
       where: { Email: email },
+      attributes: { exclude: ['Password'] },
     });
     if (user) return user;
     throw new HttpException(
@@ -36,16 +40,30 @@ export class UsersService {
     );
   }
 
-  async uploadUserImage(files: Promise<Upload>[]) {
-    const dirPath = join('dist', '/uploads');
+  async getUserImages(userId: string) {
+    const images = await this.userImagesModel.findAll({
+      where: { UserID: userId },
+    });
+    return images;
+  }
+
+  async addUserImage(userId: string, imageURL: string) {
+    await this.userImagesModel.create({ UserID: userId, URL: imageURL });
+  }
+
+  async uploadUserImage(userId  :string,files: Promise<Upload>[]) {
+    const dirPath = 'dist/uploads';
     if (!existsSync(dirPath)) {
       mkdirSync(dirPath, { recursive: true });
     }
+
     const operation = await Promise.all(
       files.map(async (file) => {
         const { filename, createReadStream } = await file;
+        const fileExt = path.extname(filename);
+        const randomFileName = await crypto.randomUUID();
         const stream = createReadStream();
-        const fileDestination = `dist/uploads/${filename}`;
+        const fileDestination = `dist/uploads/${randomFileName}.${fileExt}`;
         const sharpOptions: sharp.ResizeOptions = {
           width: 300,
           height: 300,
@@ -56,6 +74,7 @@ export class UsersService {
           fileDestination,
           sharpOptions,
         );
+        await this.addUserImage(userId ,fileDestination)
       }),
     );
     // const dirPath = join(__dirname, '/uploads');

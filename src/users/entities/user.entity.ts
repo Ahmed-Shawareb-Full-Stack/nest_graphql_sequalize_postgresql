@@ -1,5 +1,6 @@
 import { ObjectType, Field, Int, ID, DateScalarMode } from '@nestjs/graphql';
 import { DataType } from 'sequelize-typescript';
+import { UserImages } from './user-images.entity';
 
 @ObjectType()
 export class User {
@@ -20,4 +21,7 @@ export class User {
 
   @Field(() => Date)
   UpdatedAt: Date;
+
+  @Field(() => [UserImages] , {nullable :"items"})
+  Images: UserImages[];
 }
