@@ -1,5 +1,5 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
+
 import {
   AcceptLanguageResolver,
   GraphQLWebsocketResolver,
@@ -30,7 +32,6 @@ import {
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE'),
-        synchronize: true,
         autoLoadModels: true,
       }),
     }),
@@ -54,18 +55,18 @@ import {
         };
       },
     }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      loaderOptions: {
-        path: join(__dirname, '/i18n/'),
-        watch: true,
-      },
-      resolvers: [
-        GraphQLWebsocketResolver,
-        { use: QueryResolver, options: ['lang'] },
-        AcceptLanguageResolver,
-      ],
-    }),
+    // I18nModule.forRoot({
+    //   fallbackLanguage: 'en',
+    //   loaderOptions: {
+    //     path: join(__dirname, '/i18n/'),
+    //     watch: true,
+    //   },
+    //   resolvers: [
+    //     GraphQLWebsocketResolver,
+    //     { use: QueryResolver, options: ['lang'] },
+    //     AcceptLanguageResolver,
+    //   ],
+    // }),
     AuthModule,
     UsersModule,
   ],
@@ -77,4 +78,10 @@ import {
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(graphqlUploadExpress({ maxFileSize: 100000000, maxFiles: 10 }))
+      .forRoutes('graphql');
+  }
+}

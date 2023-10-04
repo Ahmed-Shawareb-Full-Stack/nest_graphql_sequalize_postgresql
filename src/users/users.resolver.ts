@@ -20,10 +20,11 @@ export class UsersResolver {
     return 'Hello';
   }
 
-  @Mutation(() => String, { name: 'uploadFile' })
+  @Mutation(() => Boolean)
   async uploadFile(
-    @Args({name : "file" ,  type: () => GraphQLUpload }) file: Upload,
+    @Args({ name: 'file', type: () => [GraphQLUpload] })
+    files: Promise<Upload>[],
   ) {
-    return await this.usersService.uploadUserImage(file);
+    return await this.usersService.uploadUserImage(files);
   }
 }
