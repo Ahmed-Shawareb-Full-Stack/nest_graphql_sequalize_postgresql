@@ -5,12 +5,14 @@ import {
   DataType,
   Default,
   DeletedAt,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
   Unique,
   UpdatedAt,
 } from 'sequelize-typescript';
+import { UserImages } from './user-image.model';
 
 @Table({
   tableName: 'Users',
@@ -45,4 +47,7 @@ export class User extends Model {
   @UpdatedAt
   @Column
   UpdatedAt: Date;
+
+  @HasMany(() => UserImages, 'UserId')
+  Images: UserImages[];
 }
