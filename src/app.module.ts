@@ -41,6 +41,7 @@ import {
       buildSchemaOptions: {
         dateScalarMode: 'isoDate',
       },
+      subscriptions: { 'graphql-ws': true },
     }),
     JwtModule.registerAsync({
       global: true,
