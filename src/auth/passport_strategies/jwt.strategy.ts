@@ -21,6 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload) {
     const { Email } = payload;
     const user: User = await this.usersService.findByEmail(Email);
+    delete user.dataValues.Password;
     if (!user) {
       return new UnauthorizedException('Wrong Credentials');
     }

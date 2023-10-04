@@ -31,7 +31,6 @@ export class UsersService {
   async findByEmail(email: string) {
     const user = await this.userModel.findOne({
       where: { Email: email },
-      attributes: { exclude: ['Password'] },
     });
     if (user) return user;
     throw new HttpException(
@@ -51,7 +50,7 @@ export class UsersService {
     await this.userImagesModel.create({ UserID: userId, URL: imageURL });
   }
 
-  async uploadUserImage(userId  :string,files: Promise<Upload>[]) {
+  async uploadUserImage(userId: string, files: Promise<Upload>[]) {
     const dirPath = 'dist/uploads';
     if (!existsSync(dirPath)) {
       mkdirSync(dirPath, { recursive: true });
@@ -74,7 +73,7 @@ export class UsersService {
           fileDestination,
           sharpOptions,
         );
-        await this.addUserImage(userId ,fileDestination)
+        await this.addUserImage(userId, fileDestination);
       }),
     );
     // const dirPath = join(__dirname, '/uploads');

@@ -43,6 +43,7 @@ export class AuthService {
     try {
       const { Email, Password } = loginUserInput;
       const user = await this.usersService.findByEmail(Email);
+      console.log("first")
       await this.compareUserPassword(Password, user.Password);
       delete user.Password;
       return user;
@@ -53,6 +54,7 @@ export class AuthService {
 
   async compareUserPassword(loginPassword: string, DBPassword: string) {
     const isPasswordMatched = await bcrypt.compare(loginPassword, DBPassword);
+    console.log("second")
     if (!isPasswordMatched) {
       throw new HttpException('Wrong Credentials', HttpStatus.UNAUTHORIZED);
     }
