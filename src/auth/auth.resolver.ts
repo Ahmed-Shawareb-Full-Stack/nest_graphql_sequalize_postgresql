@@ -30,6 +30,7 @@ export class AuthResolver {
     @Args('loginUserInput') loginUserInput: LoginUserInput,
     @Context() context,
   ) {
+    console.log(loginUserInput)
     return this.authService.login(context.user);
   }
 }

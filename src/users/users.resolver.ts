@@ -29,12 +29,6 @@ enum SUB_EVENTS {
   event = 'event',
 }
 
-@ObjectType()
-class SendSub {
-  @Field(() => String)
-  name: string;
-}
-
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
@@ -45,9 +39,6 @@ export class UsersResolver {
   @Mutation(() => String)
   emitEvent(@Args('input') eventInput: String) {
     const eventSent = SerializeGQLInput(eventInput) as string;
-    const sendSub = {
-      name: 'ahmed',
-    };
     this.pubSub.publish(SUB_EVENTS.event, { event: eventInput });
     return eventSent;
   }
