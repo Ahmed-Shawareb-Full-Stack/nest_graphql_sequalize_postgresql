@@ -5,7 +5,7 @@
   },
   "ENGLISH": "الانجليزية",
   "ARRAY": ["ONE", "TWO", "THREE"],
-  "cat": "Cat",
+  "cat": "ttt",
   "cat_name": "Cat: {name}",
   "set-up-password": {
     "heading": "Hello, {username}",

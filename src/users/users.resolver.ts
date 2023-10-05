@@ -17,10 +17,18 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { UserImages } from './entities/user-images.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
+
+  @Query(() => String)
+  localize(@Context() context, @I18n() i18n: I18nContext) {
+    const requestLanguageFromHeader = context.req.headers['lang'];
+    // return i18n.t('test.HELLO', { lang: requestLanguageFromHeader })
+    return this.usersService.local(requestLanguageFromHeader, '');
+  }
 
   @Mutation(() => User)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
@@ -44,7 +52,7 @@ export class UsersResolver {
     files: Promise<Upload>[],
     @Context() context,
   ) {
-    const user =context.req.user;
-    return await this.usersService.uploadUserImage(user.ID , files);
+    const user = context.req.user;
+    return await this.usersService.uploadUserImage(user.ID, files);
   }
 }

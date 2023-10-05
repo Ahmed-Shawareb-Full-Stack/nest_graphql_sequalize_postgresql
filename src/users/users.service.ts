@@ -4,15 +4,14 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './model/user.model';
 import SerializeGQLInput from '../Libs/serializeGQL';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import * as path from 'path';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import * as Upload from 'graphql-upload/Upload.js';
-import * as concat from 'concat-stream';
 import * as sharp from 'sharp';
 import { ImageProcessing } from '../Libs/ImageProcessing';
 import { UserImages } from './model/user-image.model';
 import * as crypto from 'crypto';
+import { TranslateService } from '../Libs/Translate';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +19,14 @@ export class UsersService {
     @InjectModel(User) private userModel: typeof User,
     @InjectModel(UserImages) private userImagesModel: typeof UserImages,
     private readonly imageProcess: ImageProcessing,
+    private readonly translateService: TranslateService,
   ) {}
+
+  async local(lang, data) {
+    console.log(lang);
+    return this.translateService.translate('test.HELLO', lang);
+  }
+
   async create(createUserInput: CreateUserInput) {
     try {
       const user = this.userModel.create(SerializeGQLInput(createUserInput));

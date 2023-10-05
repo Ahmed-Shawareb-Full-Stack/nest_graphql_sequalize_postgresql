@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
+import * as path from 'path';
 
 import {
   AcceptLanguageResolver,
@@ -56,18 +57,18 @@ import {
         };
       },
     }),
-    // I18nModule.forRoot({
-    //   fallbackLanguage: 'en',
-    //   loaderOptions: {
-    //     path: join(__dirname, '/i18n/'),
-    //     watch: true,
-    //   },
-    //   resolvers: [
-    //     GraphQLWebsocketResolver,
-    //     { use: QueryResolver, options: ['lang'] },
-    //     AcceptLanguageResolver,
-    //   ],
-    // }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        GraphQLWebsocketResolver,
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+      ],
+    }),
     AuthModule,
     UsersModule,
   ],
@@ -82,7 +83,7 @@ import {
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(graphqlUploadExpress({ maxFileSize: 100000000, maxFiles: 10 }))
+      .apply(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }))
       .forRoutes('graphql');
   }
 }
