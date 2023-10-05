@@ -9,19 +9,54 @@ import {
   ResolveField,
   Parent,
   Context,
+  Subscription,
+  Field,
+  ObjectType,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserImages } from './entities/user-images.entity';
-import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Inject, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { I18n, I18nContext } from 'nestjs-i18n';
+import SerializeGQLInput from '../Libs/serializeGQL';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { PUB_SUB } from '../pubsub/pubsub.module';
+
+enum SUB_EVENTS {
+  event = 'event',
+}
+
+@ObjectType()
+class SendSub {
+  @Field(() => String)
+  name: string;
+}
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
+  ) {}
+
+  @Mutation(() => String)
+  emitEvent(@Args('input') eventInput: String) {
+    const eventSent = SerializeGQLInput(eventInput) as string;
+    const sendSub = {
+      name: 'ahmed',
+    };
+    this.pubSub.publish(SUB_EVENTS.event, { event: eventInput });
+    return eventSent;
+  }
+
+  @Subscription(() => String, { name: 'event' })
+  event() {
+    console.log(this.pubSub.asyncIterator(SUB_EVENTS.event));
+    return this.pubSub.asyncIterator(SUB_EVENTS.event);
+  }
 
   @Query(() => String)
   localize(@Context() context, @I18n() i18n: I18nContext) {

@@ -17,6 +17,7 @@ import {
   I18nModule,
   QueryResolver,
 } from 'nestjs-i18n';
+import { PubsubModule } from './pubsub/pubsub.module';
 
 @Module({
   imports: [
@@ -42,7 +43,10 @@ import {
       buildSchemaOptions: {
         dateScalarMode: 'isoDate',
       },
-      subscriptions: { 'graphql-ws': true },
+      introspection: true,
+      csrfPrevention: true,
+      installSubscriptionHandlers: true,
+      subscriptions: { 'graphql-ws': true, 'subscriptions-transport-ws': true },
     }),
     JwtModule.registerAsync({
       global: true,
@@ -71,6 +75,7 @@ import {
     }),
     AuthModule,
     UsersModule,
+    PubsubModule,
   ],
   controllers: [],
   providers: [
