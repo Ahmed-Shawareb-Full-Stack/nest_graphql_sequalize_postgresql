@@ -37,6 +37,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE'),
         autoLoadModels: true,
+        logging: true,
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -49,7 +50,9 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       csrfPrevention: true,
       installSubscriptionHandlers: true,
       subscriptions: { 'graphql-ws': true, 'subscriptions-transport-ws': true },
-      context: ({ req }) => ({ req }),
+      context: ({ req }) => ({
+        req,
+      }),
     }),
     JwtModule.registerAsync({
       global: true,

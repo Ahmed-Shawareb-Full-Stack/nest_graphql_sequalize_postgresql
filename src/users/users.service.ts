@@ -28,8 +28,16 @@ export class UsersService {
 
   async create(createUserInput: CreateUserInput) {
     try {
-      const user = this.userModel.create(SerializeGQLInput(createUserInput));
+      const user = await this.userModel.create(
+        SerializeGQLInput(createUserInput),
+      );
       return user;
+    } catch (error) {}
+  }
+
+  async getAll() {
+    try {
+      return await this.userModel.findAll();
     } catch (error) {}
   }
 
@@ -49,6 +57,15 @@ export class UsersService {
       where: { UserID: userId },
     });
     return images;
+  }
+
+  async getUsersImages(usersIds) {
+    const usersImages = await this.userImagesModel.findAll({
+      where: {
+        UserID: usersIds,
+      },
+    });
+    return usersImages;
   }
 
   async addUserImage(userId: string, imageURL: string) {

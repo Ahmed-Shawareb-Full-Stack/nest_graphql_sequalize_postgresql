@@ -27,6 +27,8 @@ import { PUB_SUB } from '../pubsub/pubsub.module';
 import { Roles } from './decorators/roles.decorator';
 import { UserRoles } from './libs/User.enum';
 import { RolesGuard } from './guards/roles.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { ImagesLoader } from './users.loader';
 
 enum SUB_EVENTS {
   event = 'event',
@@ -37,6 +39,7 @@ export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
+    private readonly imagesLoader: ImagesLoader,
   ) {}
 
   @Mutation(() => String)
@@ -46,10 +49,10 @@ export class UsersResolver {
     return eventSent;
   }
 
-  @Subscription(() => String, { name: 'event' })
-  event() {
-    return this.pubSub.asyncIterator(SUB_EVENTS.event);
-  }
+  // @Subscription(() => String, { name: 'event' })
+  // event() {
+  //   return this.pubSub.asyncIterator(SUB_EVENTS.event);
+  // }
 
   @Query(() => String)
   localize(@Context() context) {
@@ -63,16 +66,22 @@ export class UsersResolver {
     return this.usersService.create(createUserInput);
   }
 
-  @Roles(UserRoles.Admin)
+  @Roles(UserRoles.User)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Query(() => String, { name: 'hello' })
-  hello() {
-    return 'Hello';
+  @Query(() => User, { name: 'user' })
+  currentUser(@CurrentUser() user: User) {
+    return user;
+  }
+
+  @Query(() => [User], { name: 'users' })
+  getALlUsers() {
+    return this.usersService.getAll();
   }
 
   @ResolveField(() => [UserImages])
   async Images(@Parent() user: User) {
-    return this.usersService.getUserImages(user.ID);
+    const image = await this.imagesLoader.findById.load(user.ID);
+    return image;
   }
 
   @Mutation(() => Boolean)
