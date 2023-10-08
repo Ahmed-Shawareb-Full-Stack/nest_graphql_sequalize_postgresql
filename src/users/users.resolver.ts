@@ -45,7 +45,6 @@ export class UsersResolver {
 
   @Subscription(() => String, { name: 'event' })
   event() {
-    console.log(this.pubSub.asyncIterator(SUB_EVENTS.event));
     return this.pubSub.asyncIterator(SUB_EVENTS.event);
   }
 
