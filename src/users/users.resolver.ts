@@ -29,6 +29,7 @@ import { UserRoles } from './libs/User.enum';
 import { RolesGuard } from './guards/roles.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { ImagesLoader } from './users.loader';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
 enum SUB_EVENTS {
   event = 'event',
@@ -54,8 +55,9 @@ export class UsersResolver {
   //   return this.pubSub.asyncIterator(SUB_EVENTS.event);
   // }
 
-  @Query(() => String)
-  localize(@Context() context) {
+  @Query(() => String, { name: 'i18n' })
+  localize(@Context() context, @I18n() i18n: I18nContext) {
+    console.log(i18n.lang);
     const requestLanguageFromHeader = context.req.headers['lang'];
     // return i18n.t('test.HELLO', { lang: requestLanguageFromHeader })
     return this.usersService.local(requestLanguageFromHeader, '');

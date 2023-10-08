@@ -14,7 +14,9 @@ import * as path from 'path';
 import {
   AcceptLanguageResolver,
   GraphQLWebsocketResolver,
+  HeaderResolver,
   I18nModule,
+  I18nValidationPipe,
   QueryResolver,
 } from 'nestjs-i18n';
 import { PubsubModule } from './pubsub/pubsub.module';
@@ -74,6 +76,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
         watch: true,
       },
       resolvers: [
+        new HeaderResolver(['lang']),
         GraphQLWebsocketResolver,
         { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
@@ -90,12 +93,8 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       useClass: ValidationPipe,
     },
     {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
+      provide: APP_PIPE,
+      useClass: I18nValidationPipe,
     },
   ],
 })
