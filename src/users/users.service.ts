@@ -23,7 +23,6 @@ export class UsersService {
   ) {}
 
   async local(lang, data) {
-    console.log(lang);
     return this.translateService.translate('test.HELLO', lang);
   }
 

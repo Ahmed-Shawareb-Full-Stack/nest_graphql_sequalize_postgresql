@@ -7,8 +7,8 @@ import SerializeGQLInput from '../../Libs/serializeGQL';
 export class GQLAuthGuard extends AuthGuard('local') {
   getRequest(context: ExecutionContext) {
     const CTX = GqlExecutionContext.create(context);
-    const request = CTX.getContext().req;
-    request.user = SerializeGQLInput(CTX.getArgs().loginUserInput);
+    const request = CTX.getContext();
+    request.body = SerializeGQLInput(CTX.getArgs().loginUserInput);
     return request;
   }
 }
