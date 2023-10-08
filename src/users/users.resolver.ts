@@ -12,18 +12,21 @@ import {
   Subscription,
   Field,
   ObjectType,
+  GqlExecutionContext,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserImages } from './entities/user-images.entity';
-import { Inject, UseGuards } from '@nestjs/common';
+import { ExecutionContext, Inject, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { I18n, I18nContext } from 'nestjs-i18n';
 import SerializeGQLInput from '../Libs/serializeGQL';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { PUB_SUB } from '../pubsub/pubsub.module';
+import { Roles } from './decorators/roles.decorator';
+import { UserRoles } from './libs/User.enum';
+import { RolesGuard } from './guards/roles.guard';
 
 enum SUB_EVENTS {
   event = 'event',
@@ -50,7 +53,7 @@ export class UsersResolver {
   }
 
   @Query(() => String)
-  localize(@Context() context, @I18n() i18n: I18nContext) {
+  localize(@Context() context) {
     const requestLanguageFromHeader = context.req.headers['lang'];
     // return i18n.t('test.HELLO', { lang: requestLanguageFromHeader })
     return this.usersService.local(requestLanguageFromHeader, '');
@@ -61,6 +64,8 @@ export class UsersResolver {
     return this.usersService.create(createUserInput);
   }
 
+  @Roles(UserRoles.Admin)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Query(() => String, { name: 'hello' })
   hello() {
     return 'Hello';

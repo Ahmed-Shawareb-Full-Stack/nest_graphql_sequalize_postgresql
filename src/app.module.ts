@@ -1,6 +1,6 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { join } from 'path';
@@ -18,6 +18,8 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import { PubsubModule } from './pubsub/pubsub.module';
+import { RolesGuard } from './users/guards/roles.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { PubsubModule } from './pubsub/pubsub.module';
       csrfPrevention: true,
       installSubscriptionHandlers: true,
       subscriptions: { 'graphql-ws': true, 'subscriptions-transport-ws': true },
+      context: ({ req }) => ({ req }),
     }),
     JwtModule.registerAsync({
       global: true,
@@ -82,6 +85,14 @@ import { PubsubModule } from './pubsub/pubsub.module';
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })
