@@ -40,6 +40,10 @@ export class User extends Model {
   @Column(DataType.TEXT)
   Password: string;
 
+  @AllowNull(true)
+  @Column(DataType.ENUM('user', 'admin'))
+  Role: string;
+
   @CreatedAt
   @Column
   CreatedAt: Date;

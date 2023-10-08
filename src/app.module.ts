@@ -1,6 +1,6 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { join } from 'path';
@@ -14,10 +14,14 @@ import * as path from 'path';
 import {
   AcceptLanguageResolver,
   GraphQLWebsocketResolver,
+  HeaderResolver,
   I18nModule,
+  I18nValidationPipe,
   QueryResolver,
 } from 'nestjs-i18n';
 import { PubsubModule } from './pubsub/pubsub.module';
+import { RolesGuard } from './users/guards/roles.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -35,6 +39,7 @@ import { PubsubModule } from './pubsub/pubsub.module';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE'),
         autoLoadModels: true,
+        logging: true,
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -47,6 +52,9 @@ import { PubsubModule } from './pubsub/pubsub.module';
       csrfPrevention: true,
       installSubscriptionHandlers: true,
       subscriptions: { 'graphql-ws': true, 'subscriptions-transport-ws': true },
+      context: ({ req }) => ({
+        req,
+      }),
     }),
     JwtModule.registerAsync({
       global: true,
@@ -68,6 +76,7 @@ import { PubsubModule } from './pubsub/pubsub.module';
         watch: true,
       },
       resolvers: [
+        new HeaderResolver(['lang']),
         GraphQLWebsocketResolver,
         { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
@@ -82,6 +91,10 @@ import { PubsubModule } from './pubsub/pubsub.module';
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: I18nValidationPipe,
     },
   ],
 })

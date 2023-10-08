@@ -12,18 +12,24 @@ import {
   Subscription,
   Field,
   ObjectType,
+  GqlExecutionContext,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserImages } from './entities/user-images.entity';
-import { Inject, UseGuards } from '@nestjs/common';
+import { ExecutionContext, Inject, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { I18n, I18nContext } from 'nestjs-i18n';
 import SerializeGQLInput from '../Libs/serializeGQL';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { PUB_SUB } from '../pubsub/pubsub.module';
+import { Roles } from './decorators/roles.decorator';
+import { UserRoles } from './libs/User.enum';
+import { RolesGuard } from './guards/roles.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { ImagesLoader } from './users.loader';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
 enum SUB_EVENTS {
   event = 'event',
@@ -34,6 +40,7 @@ export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
+    private readonly imagesLoader: ImagesLoader,
   ) {}
 
   @Mutation(() => String)
@@ -43,13 +50,14 @@ export class UsersResolver {
     return eventSent;
   }
 
-  @Subscription(() => String, { name: 'event' })
-  event() {
-    return this.pubSub.asyncIterator(SUB_EVENTS.event);
-  }
+  // @Subscription(() => String, { name: 'event' })
+  // event() {
+  //   return this.pubSub.asyncIterator(SUB_EVENTS.event);
+  // }
 
-  @Query(() => String)
+  @Query(() => String, { name: 'i18n' })
   localize(@Context() context, @I18n() i18n: I18nContext) {
+    console.log(i18n.lang);
     const requestLanguageFromHeader = context.req.headers['lang'];
     // return i18n.t('test.HELLO', { lang: requestLanguageFromHeader })
     return this.usersService.local(requestLanguageFromHeader, '');
@@ -60,14 +68,22 @@ export class UsersResolver {
     return this.usersService.create(createUserInput);
   }
 
-  @Query(() => String, { name: 'hello' })
-  hello() {
-    return 'Hello';
+  @Roles(UserRoles.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Query(() => User, { name: 'user' })
+  currentUser(@CurrentUser() user: User) {
+    return user;
+  }
+
+  @Query(() => [User], { name: 'users' })
+  getALlUsers() {
+    return this.usersService.getAll();
   }
 
   @ResolveField(() => [UserImages])
   async Images(@Parent() user: User) {
-    return this.usersService.getUserImages(user.ID);
+    const image = await this.imagesLoader.findById.load(user.ID);
+    return image;
   }
 
   @Mutation(() => Boolean)

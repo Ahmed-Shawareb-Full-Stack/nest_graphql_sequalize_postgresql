@@ -16,12 +16,15 @@ export class User {
   @Field(() => String)
   Email: string;
 
+  @Field(() => String)
+  Role: string;
+
   @Field(() => Date)
   CreatedAt: Date;
 
   @Field(() => Date)
   UpdatedAt: Date;
 
-  @Field(() => [UserImages] , {nullable :"items"})
+  @Field(() => [UserImages], { nullable: 'items' })
   Images: UserImages[];
 }
