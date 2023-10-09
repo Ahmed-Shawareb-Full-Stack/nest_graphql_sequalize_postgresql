@@ -1,6 +1,6 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { join } from 'path';
@@ -16,15 +16,19 @@ import {
   GraphQLWebsocketResolver,
   HeaderResolver,
   I18nModule,
+  I18nValidationExceptionFilter,
   I18nValidationPipe,
   QueryResolver,
 } from 'nestjs-i18n';
 import { PubsubModule } from './pubsub/pubsub.module';
 import { RolesGuard } from './users/guards/roles.guard';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { EmailModule } from './email/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -76,8 +80,8 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
         watch: true,
       },
       resolvers: [
-        new HeaderResolver(['lang']),
         GraphQLWebsocketResolver,
+        new HeaderResolver(['lang']),
         { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
       ],
@@ -85,17 +89,18 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     AuthModule,
     UsersModule,
     PubsubModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-    {
-      provide: APP_PIPE,
-      useClass: I18nValidationPipe,
-    },
+    // {
+    //   provide: APP_PIPE,
+    //   useClass: ValidationPipe,
+    // },
+    // {
+    //   provide: APP_PIPE,
+    //   useClass: I18nValidationPipe,
+    // },
   ],
 })
 export class AppModule {

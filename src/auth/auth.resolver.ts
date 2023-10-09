@@ -4,10 +4,11 @@ import { AuthService } from './auth.service';
 import { User } from '../users/entities/user.entity';
 import { CreateUserInput } from '../users/dto/create-user.input';
 import { LoginUserInput } from 'src/users/dto/login-user.input';
-import { UseGuards } from '@nestjs/common';
+import { UseFilters, UseGuards } from '@nestjs/common';
 import { GQLAuthGuard } from './guards/gql_auth.guard';
 import { LoginUser } from './Types/LoginUser.query';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { I18nValidationExceptionFilter } from 'nestjs-i18n';
 
 @Resolver(() => User)
 export class AuthResolver {
