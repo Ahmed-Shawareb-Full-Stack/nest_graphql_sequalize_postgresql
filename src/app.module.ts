@@ -25,9 +25,24 @@ import { RolesGuard } from './users/guards/roles.guard';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { EmailModule } from './email/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
+import { BullModule } from '@nestjs/bull';
+import { DataloaderModule } from './dataloader/dataloader.module';
+import { DataloaderService } from './dataloader/dataloader.service';
 @Module({
   imports: [
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          port: configService.get('REDIS_PORT'),
+          host: configService.get('REDIS_HOST'),
+        },
+      }),
+    }),
+    // BullModule.registerQueue({
+    //   name: 'sendEmail',
+    // }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -46,19 +61,28 @@ import { ScheduleModule } from '@nestjs/schedule';
         logging: true,
       }),
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+      imports: [DataloaderModule],
+      inject: [DataloaderService],
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), '../schema.gql'),
-      buildSchemaOptions: {
-        dateScalarMode: 'isoDate',
+      useFactory: (dataloaderService: DataloaderService) => {
+        return {
+          autoSchemaFile: join(process.cwd(), '../schema.gql'),
+          buildSchemaOptions: {
+            dateScalarMode: 'isoDate',
+          },
+          introspection: true,
+          csrfPrevention: true,
+          installSubscriptionHandlers: true,
+          subscriptions: {
+            'graphql-ws': true,
+            'subscriptions-transport-ws': true,
+          },
+          context: () => ({
+            loaders: dataloaderService.createLoaders(),
+          }),
+        };
       },
-      introspection: true,
-      csrfPrevention: true,
-      installSubscriptionHandlers: true,
-      subscriptions: { 'graphql-ws': true, 'subscriptions-transport-ws': true },
-      context: ({ req }) => ({
-        req,
-      }),
     }),
     JwtModule.registerAsync({
       global: true,
@@ -90,6 +114,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     UsersModule,
     PubsubModule,
     EmailModule,
+    DataloaderModule,
   ],
   controllers: [],
   providers: [

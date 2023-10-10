@@ -8,18 +8,18 @@ import {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(I18nMiddleware);
+  // app.use(I18nMiddleware);
   // app.useGlobalPipes(new ValidationPipe())
-  app.useGlobalPipes(
-    new I18nValidationPipe({
-      always: true,
-      disableErrorMessages: false,
-      stopAtFirstError: true,
-    }),
-  );
-  app.useGlobalFilters(new I18nValidationExceptionFilter({
-    detailedErrors : false
-  }));
+  // app.useGlobalPipes(
+  //   new I18nValidationPipe({
+  //     always: true,
+  //     disableErrorMessages: false,
+  //     stopAtFirstError: true,
+  //   }),
+  // );
+  // app.useGlobalFilters(new I18nValidationExceptionFilter({
+  //   detailedErrors : false
+  // }));
   await app.listen(3000);
 }
 bootstrap();

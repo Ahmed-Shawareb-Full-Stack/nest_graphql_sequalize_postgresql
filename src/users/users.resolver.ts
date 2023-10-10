@@ -28,7 +28,6 @@ import { Roles } from './decorators/roles.decorator';
 import { UserRoles } from './libs/User.enum';
 import { RolesGuard } from './guards/roles.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { ImagesLoader } from './users.loader';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 enum SUB_EVENTS {
@@ -40,7 +39,6 @@ export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
-    private readonly imagesLoader: ImagesLoader,
   ) {}
 
   @Mutation(() => String)
@@ -81,8 +79,8 @@ export class UsersResolver {
   }
 
   @ResolveField(() => [UserImages])
-  async Images(@Parent() user: User) {
-    const image = await this.imagesLoader.findById.load(user.ID);
+  async Images(@Parent() user: User, @Context() { loaders }: IGraphQLContext) {
+    const image = await loaders.userImagesLoader.load(user.ID);
     return image;
   }
 

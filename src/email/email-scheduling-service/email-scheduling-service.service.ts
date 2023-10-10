@@ -14,9 +14,8 @@ export class EmailSchedulingServiceService {
   scheduleEmail(emailSchedule: EmailScheduleDTO) {
     const emailDate = new Date(emailSchedule.date);
     const now = Date.now().toLocaleString();
-    const cronName = `${Date.now().toLocaleString()}-${emailSchedule.subject}`;
+    const cronName = `${now}-${emailSchedule.subject}`;
     const sendEmailJob = new CronJob(emailDate, () => {
-      console.log("first")
       this.emailService.sendEmail({
         to: emailSchedule.recipient,
         subject: emailSchedule.subject,
