@@ -48,10 +48,10 @@ export class UsersResolver {
     return eventSent;
   }
 
-  // @Subscription(() => String, { name: 'event' })
-  // event() {
-  //   return this.pubSub.asyncIterator(SUB_EVENTS.event);
-  // }
+  @Subscription(() => String, { name: 'event' })
+  event() {
+    return this.pubSub.asyncIterator(SUB_EVENTS.event);
+  }
 
   @Query(() => String, { name: 'i18n' })
   localize(@Context() context, @I18n() i18n: I18nContext) {

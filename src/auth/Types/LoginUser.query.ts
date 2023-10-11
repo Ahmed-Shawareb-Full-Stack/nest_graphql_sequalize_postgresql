@@ -5,4 +5,7 @@ import { User } from 'src/users/entities/user.entity';
 export class LoginUser {
   @Field(() => String)
   accessToken: string;
+  
+  @Field(() => User)
+  user : User
 }

@@ -6,10 +6,11 @@ import { I18n, I18nContext } from 'nestjs-i18n';
 export class TranslateService {
   constructor(private readonly i18nService: I18nService) {}
 
-  async translate(key: string, language: string) {
-    const translation = await this.i18nService.translate(key, {
-      lang: language,
-    });
+  translate(key): string {
+    const lang = I18nContext.current().lang;
+    const translation = this.i18nService.translate(key, {
+      lang,
+    }) as string;
     return translation;
   }
 }

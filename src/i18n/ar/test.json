@@ -19,6 +19,9 @@
   },
   "nested": "We go shopping: $t(test.day_interval, {{\"count\": {count} }})",
   "validation": {
-    "IsEmail": "البريد الاكترونى غير صحيح"
+    "email": "البريد الاكترونى غير صحيح",
+    "internalServerError": "خطأ فى الخادم",
+    "login": "خطا بالبريد او كلمة المرور",
+    "emailExist": "بالفعل يوجد لدينا هذا البريد"
   }
 }

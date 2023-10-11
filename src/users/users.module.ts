@@ -8,12 +8,7 @@ import { UserImages } from './model/user-image.model';
 import { TranslateService } from '../Libs/Translate';
 @Module({
   imports: [SequelizeModule.forFeature([User, UserImages])],
-  providers: [
-    UsersResolver,
-    UsersService,
-    ImageProcessing,
-    TranslateService,
-  ],
-  exports: [SequelizeModule, UsersService],
+  providers: [UsersResolver, UsersService, ImageProcessing, TranslateService],
+  exports: [SequelizeModule, UsersService, TranslateService],
 })
 export class UsersModule {}

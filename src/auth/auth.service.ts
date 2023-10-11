@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserInput } from '../users/dto/create-user.input';
 import { UpdateUserInput } from '../users/dto/update-user.input';
 import { UsersService } from 'src/users/users.service';
@@ -28,7 +28,7 @@ export class AuthService {
     } catch (error) {
       if (error?.parent?.code == PostgresErrorCode.UniqueViolation) {
         throw new HttpException(
-          'User with this email is already Exist',
+          'test.validation.emailExist',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -47,14 +47,15 @@ export class AuthService {
       delete user.Password;
       return user;
     } catch (error) {
-      throw new HttpException('Wrong Credentials', HttpStatus.UNAUTHORIZED);
+      // throw new HttpException('Wrong Credentials', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('test.validation.login')
     }
   }
 
   async compareUserPassword(loginPassword: string, DBPassword: string) {
     const isPasswordMatched = await bcrypt.compare(loginPassword, DBPassword);
     if (!isPasswordMatched) {
-      throw new HttpException('Wrong Credentials', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('test.validation.login');
     }
   }
 
@@ -62,7 +63,10 @@ export class AuthService {
     const { Email, ID } = user;
     const payload = { Email, ID };
     const accessToken = this.jwtService.sign(payload);
-    return { accessToken };
+    return {
+      accessToken,
+      user
+    };
   }
 
   async me() {}

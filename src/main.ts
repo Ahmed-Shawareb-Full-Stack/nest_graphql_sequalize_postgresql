@@ -5,21 +5,26 @@ import {
   I18nValidationExceptionFilter,
   I18nValidationPipe,
 } from 'nestjs-i18n';
+import { ValidationPipe } from '@nestjs/common';
+import {
+  QglValidationException,
+  validationExceptionFactory,
+} from './filters/validation.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.use(I18nMiddleware);
-  // app.useGlobalPipes(new ValidationPipe())
-  // app.useGlobalPipes(
-  //   new I18nValidationPipe({
-  //     always: true,
-  //     disableErrorMessages: false,
-  //     stopAtFirstError: true,
-  //   }),
-  // );
-  // app.useGlobalFilters(new I18nValidationExceptionFilter({
-  //   detailedErrors : false
+  app.use(I18nMiddleware);
+  // app.useGlobalPipes(new ValidationPipe({
+  //   exceptionFactory :
   // }));
+  // app.useGlobalFilters(new ValidateException());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      stopAtFirstError: true,
+      // exceptionFactory: validationExceptionFactory,
+    }),
+  );
+  app.useGlobalFilters(new QglValidationException());
   await app.listen(3000);
 }
 bootstrap();

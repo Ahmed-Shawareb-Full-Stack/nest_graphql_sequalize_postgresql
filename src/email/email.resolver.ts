@@ -3,6 +3,9 @@ import { EmailScheduleDTO } from './dto/EmailSech.dto';
 import { EmailSchedulingServiceService } from './email-scheduling-service/email-scheduling-service.service';
 import { EmailDTO } from './dto/email.dto';
 import { EmailProducerService } from './email-producer/email-producer.service';
+import { I18nValidationExceptionFilter } from 'nestjs-i18n';
+import { UseFilters, UsePipes } from '@nestjs/common';
+import { CustomValidation } from 'src/pipes/custom-validation.pipe';
 
 @Resolver()
 export class EmailResolver {
@@ -15,9 +18,10 @@ export class EmailResolver {
     return this.emailSchedulingService.scheduleEmail(emailOptions);
   }
 
-  @Mutation(() => Int, { name: 'sendEmailByQueue' })
+  // @UsePipes(new CustomValidation())
+  @Mutation(() => String, { name: 'sendEmailByQueue' })
   async sendEmailByQueue(@Args('emailOptions') emailOptions: EmailDTO) {
     const job = await this.emailProducer.addSendEmailJobToQueue(emailOptions);
-    return job.jobID
+    return job.jobID.toString();
   }
 }

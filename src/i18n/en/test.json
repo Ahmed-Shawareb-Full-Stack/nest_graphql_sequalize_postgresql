@@ -19,6 +19,9 @@
   },
   "nested": "We go shopping: $t(test.day_interval, {{\"count\": {count} }})",
   "validation": {
-    "IsEmail": "Please enter a valid email"
+    "email": "Please enter a valid email",
+    "internalServerError": "Internal Server Error",
+    "login": "Wrong email or password",
+    "emailExist" : "Email is already Exist"
   }
 }

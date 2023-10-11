@@ -16,18 +16,19 @@ import {
   GraphQLWebsocketResolver,
   HeaderResolver,
   I18nModule,
-  I18nValidationExceptionFilter,
-  I18nValidationPipe,
   QueryResolver,
 } from 'nestjs-i18n';
 import { PubsubModule } from './pubsub/pubsub.module';
-import { RolesGuard } from './users/guards/roles.guard';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { EmailModule } from './email/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
 import { DataloaderModule } from './dataloader/dataloader.module';
 import { DataloaderService } from './dataloader/dataloader.service';
+import { GraphQLError, GraphQLFormattedError } from 'graphql';
+import { TranslateService } from './Libs/Translate';
+interface CustomGqlError extends GraphQLFormattedError {
+  statusCode?: number;
+}
 @Module({
   imports: [
     BullModule.forRootAsync({
@@ -40,9 +41,6 @@ import { DataloaderService } from './dataloader/dataloader.service';
         },
       }),
     }),
-    // BullModule.registerQueue({
-    //   name: 'sendEmail',
-    // }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -62,10 +60,13 @@ import { DataloaderService } from './dataloader/dataloader.service';
       }),
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
-      imports: [DataloaderModule],
-      inject: [DataloaderService],
+      imports: [DataloaderModule, UsersModule],
+      inject: [DataloaderService, TranslateService],
       driver: ApolloDriver,
-      useFactory: (dataloaderService: DataloaderService) => {
+      useFactory: (
+        dataloaderService: DataloaderService,
+        translateService: TranslateService,
+      ) => {
         return {
           autoSchemaFile: join(process.cwd(), '../schema.gql'),
           buildSchemaOptions: {
@@ -81,6 +82,33 @@ import { DataloaderService } from './dataloader/dataloader.service';
           context: () => ({
             loaders: dataloaderService.createLoaders(),
           }),
+          formatError: (error: GraphQLError) => {
+            const statusCode = (error?.extensions?.originalError as any)
+              ?.statusCode;
+            let errorMessage;
+            if (
+              Array.isArray((error?.extensions?.originalError as any)?.message)
+            ) {
+              errorMessage =
+                (error?.extensions?.originalError as any)?.message[0] ||
+                error.message;
+            } else {
+              errorMessage =
+                (error?.extensions?.originalError as any)?.message ||
+                error.message;
+            }
+            const translatedMessage = translateService.translate(errorMessage);
+
+            const formattedError: CustomGqlError = {
+              message:
+                translatedMessage ||
+                translateService.translate(
+                  'test.validation.internalServerError',
+                ),
+              statusCode: statusCode || 500,
+            };
+            return formattedError;
+          },
         };
       },
     }),
@@ -117,16 +145,7 @@ import { DataloaderService } from './dataloader/dataloader.service';
     DataloaderModule,
   ],
   controllers: [],
-  providers: [
-    // {
-    //   provide: APP_PIPE,
-    //   useClass: ValidationPipe,
-    // },
-    // {
-    //   provide: APP_PIPE,
-    //   useClass: I18nValidationPipe,
-    // },
-  ],
+  providers: [],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

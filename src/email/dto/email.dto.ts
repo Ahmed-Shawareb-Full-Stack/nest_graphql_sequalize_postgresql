@@ -4,7 +4,7 @@ import { IsDefined, IsEmail, IsString, MinLength } from 'class-validator';
 @InputType()
 export class EmailDTO {
   @Field(() => String)
-  @IsEmail()
+  @IsEmail({}, { message: 'test.validation.email' })
   from: string;
 
   @Field(() => String)
@@ -14,9 +14,9 @@ export class EmailDTO {
   @Field(() => String)
   @IsDefined()
   @IsString()
-  @MinLength(2)
+  @MinLength(2, { message: 'test.HELLO' })
   subject: string;
-  
+
   @Field(() => String)
   @IsDefined()
   @IsString()

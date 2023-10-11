@@ -23,7 +23,7 @@ export class UsersService {
   ) {}
 
   async local(lang, data) {
-    return this.translateService.translate('test.HELLO', lang);
+    return this.translateService.translate('gfdsgdfg');
   }
 
   async create(createUserInput: CreateUserInput) {
@@ -42,14 +42,17 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    const user = await this.userModel.findOne({
-      where: { Email: email },
-    });
-    if (user) return user;
-    throw new HttpException(
-      `Can't find a user associated with this email`,
-      HttpStatus.NOT_FOUND,
-    );
+    try {
+      const user = await this.userModel.findOne({
+        where: { Email: email },
+      });
+      return user;
+    } catch (e) {
+      throw new HttpException(
+        `Can't find a user associated with this email`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   async getUserImages(userId: string) {
